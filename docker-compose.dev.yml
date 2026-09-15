@@ -1,0 +1,23 @@
+# Development database only; the app runs on the host with `npm run dev`.
+name: budgeto-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: budgeto
+      POSTGRES_PASSWORD: budgeto
+      POSTGRES_DB: budgeto
+      TZ: Europe/Paris
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U budgeto -d budgeto']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata-dev:

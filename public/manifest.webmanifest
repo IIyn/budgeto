@@ -1,0 +1,11 @@
+{
+  "name": "Budgeto",
+  "short_name": "Budgeto",
+  "description": "Gérez votre budget mensuel seul ou à plusieurs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#16131f",
+  "theme_color": "#6d4aff",
+  "lang": "fr",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

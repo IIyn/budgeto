@@ -1,0 +1,63 @@
+# Production stack (Raspberry Pi 5): `docker compose up -d --build`
+name: budgeto
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-budgeto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Définissez POSTGRES_PASSWORD dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:-budgeto}
+      TZ: Europe/Paris
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging: &logging
+      driver: local
+      options:
+        max-size: 10m
+        max-file: '3'
+
+  app:
+    build: .
+    image: budgeto:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-budgeto}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-budgeto}
+      APP_URL: ${APP_URL:-}
+      DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-10}
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    logging: *logging
+
+  # Remote access through Cloudflare Tunnel: outbound connection only, no port to open on the router.
+  # Enabled with COMPOSE_PROFILES=tunnel in .env (see .env.example).
+  cloudflared:
+    image: cloudflare/cloudflared:${CLOUDFLARED_VERSION:-latest}
+    profiles: [tunnel]
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    command: tunnel --no-autoupdate run
+    environment:
+      # Not `:?`: interpolation runs even when the profile is disabled.
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      TUNNEL_METRICS: 127.0.0.1:60123
+    healthcheck:
+      test: ['CMD', 'cloudflared', 'tunnel', '--metrics', '127.0.0.1:60123', 'ready']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging: *logging
+
+volumes:
+  pgdata:

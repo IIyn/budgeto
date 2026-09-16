@@ -15,6 +15,13 @@
       "when": 1789468345877,
       "tag": "0001_expense_icon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789556984876,
+      "tag": "0002_operation_kind",
+      "breakpoints": true
     }
   ]
 }

@@ -17,7 +17,7 @@ export function ExpensesByDay({ expenses, onSelect }: ExpensesByDayProps) {
         <section key={day}>
           <header className="text-muted-foreground mb-1 flex justify-between text-xs font-medium tracking-wide uppercase">
             <span>{formatDay(day)}</span>
-            <span className="tabular-nums">{formatMoney(items.reduce((total, e) => total + e.amount, 0))}</span>
+            <span className="tabular-nums">{formatSignedMoney(netAmount(items))}</span>
           </header>
           <div className="bg-card grid rounded-2xl border px-4 py-1">
             {items.map((expense) => (
@@ -28,6 +28,15 @@ export function ExpensesByDay({ expenses, onSelect }: ExpensesByDayProps) {
       ))}
     </div>
   )
+}
+
+/** Incomes count positively, expenses negatively. */
+function netAmount(operations: Expense[]) {
+  return operations.reduce((total, o) => total + (o.kind === 'income' ? o.amount : -o.amount), 0)
+}
+
+function formatSignedMoney(cents: number) {
+  return `${cents > 0 ? '+' : cents < 0 ? '−' : ''}${formatMoney(Math.abs(cents))}`
 }
 
 function groupByDay(expenses: Expense[]) {

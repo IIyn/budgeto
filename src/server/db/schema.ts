@@ -24,6 +24,7 @@ const timestamps = {
 
 export const memberRole = pgEnum('member_role', ['owner', 'editor', 'viewer'])
 export const categoryKind = pgEnum('category_kind', ['fixed', 'flexible'])
+export const operationKind = pgEnum('operation_kind', ['expense', 'income'])
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -105,6 +106,7 @@ export const categories = pgTable(
   (t) => [index('categories_budget_idx').on(t.budgetId)],
 )
 
+/** Day-to-day operations: expenses consume the month, one-off incomes (refund, bonus...) add to it. */
 export const expenses = pgTable(
   'expenses',
   {
@@ -114,6 +116,7 @@ export const expenses = pgTable(
       .references(() => budgets.id, { onDelete: 'cascade' }),
     categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
     createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    kind: operationKind('kind').notNull().default('expense'),
     label: text('label').notNull(),
     /** Optional icon chosen for this expense; when null the category icon is shown. */
     icon: text('icon'),
@@ -171,3 +174,4 @@ export const expensesRelations = relations(expenses, ({ one }) => ({
 
 export type MemberRole = (typeof memberRole.enumValues)[number]
 export type CategoryKind = (typeof categoryKind.enumValues)[number]
+export type OperationKind = (typeof operationKind.enumValues)[number]

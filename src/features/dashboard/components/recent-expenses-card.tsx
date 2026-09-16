@@ -20,7 +20,7 @@ export function RecentExpensesCard({ budgetId, month, canEdit }: RecentExpensesC
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dernières dépenses</CardTitle>
+        <CardTitle>Dernières opérations</CardTitle>
         <CardAction>
           <Link to="/budgets/$budgetId/expenses" params={{ budgetId }} search={{ month }} className="text-primary text-sm font-medium">
             Tout voir
@@ -42,7 +42,7 @@ function RecentExpensesList({ budgetId, month, canEdit }: RecentExpensesCardProp
   const [editing, setEditing] = useState<Expense>()
 
   if (expenses.length === 0) {
-    return <p className="text-muted-foreground text-sm">Aucune dépense ce mois-ci. Appuyez sur + pour en ajouter une.</p>
+    return <p className="text-muted-foreground text-sm">Aucune opération ce mois-ci. Appuyez sur + pour en ajouter une.</p>
   }
 
   return (

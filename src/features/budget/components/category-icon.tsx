@@ -1,5 +1,6 @@
 import {
   Baby,
+  Banknote,
   Car,
   Circle,
   Droplet,
@@ -48,12 +49,14 @@ export const CATEGORY_ICONS: Record<CategoryIconName, LucideIcon> = {
   gift: Gift,
   'graduation-cap': GraduationCap,
   dumbbell: Dumbbell,
+  banknote: Banknote,
   circle: Circle,
 }
 
 const TONES = {
   fixed: 'bg-chart-5/15 text-chart-5',
   flexible: 'bg-primary/12 text-primary',
+  income: 'bg-success/15 text-success',
   neutral: 'bg-muted text-muted-foreground',
 } as const
 

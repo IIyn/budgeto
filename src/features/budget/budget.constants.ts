@@ -20,10 +20,14 @@ export const CATEGORY_ICON_NAMES = [
   'gift',
   'graduation-cap',
   'dumbbell',
+  'banknote',
   'circle',
 ] as const
 
 export type CategoryIconName = (typeof CATEGORY_ICON_NAMES)[number]
+
+/** Shown for incomes without a custom icon, since they have no category. */
+export const INCOME_ICON: CategoryIconName = 'banknote'
 
 export const CATEGORY_ICON_LABELS: Record<CategoryIconName, string> = {
   home: 'Maison',
@@ -47,6 +51,7 @@ export const CATEGORY_ICON_LABELS: Record<CategoryIconName, string> = {
   gift: 'Cadeau',
   'graduation-cap': 'Études',
   dumbbell: 'Sport',
+  banknote: 'Argent',
   circle: 'Autre',
 }
 

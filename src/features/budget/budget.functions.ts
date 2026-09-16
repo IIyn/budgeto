@@ -46,7 +46,7 @@ export const getMonthOverviewFn = createServerFn({ method: 'GET' })
     await requireBudgetRole(context.user.id, data.budgetId)
     const { from, to } = monthRange(data.month)
 
-    const [incomeRows, categoryRows, spentRows] = await Promise.all([
+    const [incomeRows, categoryRows, operationRows] = await Promise.all([
       db.select({ amount: incomes.amount }).from(incomes).where(eq(incomes.budgetId, data.budgetId)),
       db
         .select({
@@ -61,17 +61,18 @@ export const getMonthOverviewFn = createServerFn({ method: 'GET' })
         .orderBy(asc(categories.position), asc(categories.createdAt)),
       db
         .select({
+          kind: expenses.kind,
           categoryId: expenses.categoryId,
           amount: sql<number>`${sum(expenses.amount)}::int`,
         })
         .from(expenses)
         .where(and(eq(expenses.budgetId, data.budgetId), gte(expenses.spentOn, from), lte(expenses.spentOn, to)))
-        .groupBy(expenses.categoryId),
+        .groupBy(expenses.kind, expenses.categoryId),
     ])
 
     return {
       month: data.month,
-      summary: computeSummary({ incomes: incomeRows, categories: categoryRows, expenses: spentRows }),
+      summary: computeSummary({ incomes: incomeRows, categories: categoryRows, operations: operationRows }),
       fixedCharges: categoryRows.filter((c) => c.kind === 'fixed'),
     }
   })

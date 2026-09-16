@@ -31,7 +31,7 @@ export function BalanceHero({ summary }: { summary: Summary }) {
       </div>
 
       <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
-        <Stat icon={ArrowUpRight} label="Ressources" value={summary.income} />
+        <Stat icon={ArrowUpRight} label="Ressources" value={summary.income + summary.extraIncome} />
         <Stat icon={Receipt} label="Charges fixes" value={summary.fixed} />
         <Stat icon={ArrowDownRight} label="Dépensé" value={summary.spent} />
       </dl>

@@ -17,6 +17,7 @@ export const listExpensesFn = createServerFn({ method: 'GET' })
     return db
       .select({
         id: expenses.id,
+        kind: expenses.kind,
         label: expenses.label,
         icon: expenses.icon,
         amount: expenses.amount,
@@ -46,13 +47,16 @@ export const saveExpenseFn = createServerFn({ method: 'POST' })
   .validator(saveExpenseSchema)
   .handler(async ({ data, context }) => {
     await requireBudgetRole(context.user.id, data.budgetId, 'editor')
-    await assertCategoryInBudget(data.categoryId, data.budgetId)
+    // Incomes are not filed under an envelope: they add to the whole month.
+    const categoryId = data.kind === 'income' ? null : data.categoryId
+    await assertCategoryInBudget(categoryId, data.budgetId)
 
     const values = {
+      kind: data.kind,
       label: data.label,
       icon: data.icon,
       amount: data.amount,
-      categoryId: data.categoryId,
+      categoryId,
       spentOn: data.spentOn,
     }
 

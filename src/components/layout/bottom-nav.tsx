@@ -14,7 +14,7 @@ export function BottomNav({ budget }: { budget: BudgetDetail }) {
       <nav className="bg-background/90 fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-lg">
         <div className="mx-auto grid h-16 max-w-2xl grid-cols-4 items-center px-2">
           <NavLink to="/budgets/$budgetId" budgetId={budget.id} icon={House} label="Accueil" exact />
-          <NavLink to="/budgets/$budgetId/expenses" budgetId={budget.id} icon={ReceiptText} label="Dépenses" />
+          <NavLink to="/budgets/$budgetId/expenses" budgetId={budget.id} icon={ReceiptText} label="Opérations" />
           <NavLink to="/budgets/$budgetId/settings" budgetId={budget.id} icon={Settings} label="Réglages" />
           {canEdit && (
             <div className="flex justify-center">
@@ -22,7 +22,7 @@ export function BottomNav({ budget }: { budget: BudgetDetail }) {
                 type="button"
                 onClick={() => setAdding(true)}
                 className="bg-primary text-primary-foreground shadow-primary/30 flex size-13 items-center justify-center rounded-2xl shadow-lg transition active:scale-95"
-                aria-label="Ajouter une dépense"
+                aria-label="Ajouter une opération"
               >
                 <Plus className="size-6" />
               </button>

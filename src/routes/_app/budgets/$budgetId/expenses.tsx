@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_app/budgets/$budgetId/expenses')({
     ])
     return deps
   },
-  head: () => ({ meta: [{ title: 'Dépenses — Budgeto' }] }),
+  head: () => ({ meta: [{ title: 'Opérations — Budgeto' }] }),
   component: ExpensesPage,
 })
 
@@ -42,7 +42,8 @@ function ExpensesPage() {
   const [editing, setEditing] = useState<Expense>()
 
   const canEdit = hasRole(budget.role, 'editor')
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  const spent = expenses.filter((e) => e.kind === 'expense').reduce((sum, e) => sum + e.amount, 0)
+  const received = expenses.filter((e) => e.kind === 'income').reduce((sum, e) => sum + e.amount, 0)
 
   return (
     <div className="grid gap-4">
@@ -50,12 +51,15 @@ function ExpensesPage() {
 
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dépenses</h1>
+          <h1 className="text-2xl font-bold">Opérations</h1>
           <p className="text-muted-foreground text-sm">
-            {expenses.length} dépense{expenses.length > 1 ? 's' : ''}
+            {expenses.length} opération{expenses.length > 1 ? 's' : ''}
           </p>
         </div>
-        <p className="text-2xl font-bold tabular-nums">{formatMoney(total)}</p>
+        <div className="text-right">
+          <p className="text-2xl font-bold tabular-nums">{spent > 0 && '−'}{formatMoney(spent)}</p>
+          {received > 0 && <p className="text-success text-sm font-medium tabular-nums">+{formatMoney(received)}</p>}
+        </div>
       </div>
 
       <CategoryFilter categories={categories} selected={category} />
@@ -63,7 +67,7 @@ function ExpensesPage() {
       {expenses.length === 0 ? (
         <div className="text-muted-foreground flex flex-col items-center gap-3 py-16 text-center">
           <ReceiptText className="size-10 opacity-50" />
-          <p>Aucune dépense pour cette période.</p>
+          <p>Aucune opération pour cette période.</p>
         </div>
       ) : (
         <ExpensesByDay expenses={expenses} onSelect={canEdit ? setEditing : undefined} />

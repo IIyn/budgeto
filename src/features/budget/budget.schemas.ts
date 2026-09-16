@@ -16,6 +16,7 @@ export const budgetScopeSchema = z.object({ budgetId: budgetIdSchema })
 export const monthScopeSchema = budgetScopeSchema.extend({ month: monthSchema })
 
 export const categoryKindSchema = z.enum(['fixed', 'flexible'])
+export const operationKindSchema = z.enum(['expense', 'income'])
 export const memberRoleSchema = z.enum(['owner', 'editor', 'viewer'])
 export const categoryIconSchema = z.enum(CATEGORY_ICON_NAMES)
 
@@ -45,6 +46,7 @@ export const deleteItemSchema = budgetScopeSchema.extend({ id: z.uuid() })
 
 export const saveExpenseSchema = budgetScopeSchema.extend({
   id: z.uuid().optional(),
+  kind: operationKindSchema,
   label: labelSchema,
   amount: centsSchema.min(1, 'Le montant doit être supérieur à 0'),
   categoryId: z.uuid().nullable(),
@@ -70,4 +72,5 @@ export type IncomeDraft = z.infer<typeof incomeDraftSchema>
 export type CategoryDraft = z.infer<typeof categoryDraftSchema>
 export type CompleteOnboardingInput = z.infer<typeof completeOnboardingSchema>
 export type CategoryKind = z.infer<typeof categoryKindSchema>
+export type OperationKind = z.infer<typeof operationKindSchema>
 export type MemberRole = z.infer<typeof memberRoleSchema>

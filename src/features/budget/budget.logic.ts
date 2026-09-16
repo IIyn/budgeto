@@ -16,19 +16,22 @@ export function sortEnvelopesFirst<T extends { kind: 'fixed' | 'flexible' }>(cat
 export type SummaryInput<TCategory extends CategoryLike> = {
   incomes: { amount: number }[]
   categories: TCategory[]
-  expenses: { amount: number; categoryId: string | null }[]
+  /** Expenses and one-off incomes added during the month. */
+  operations: { kind: 'expense' | 'income'; amount: number; categoryId: string | null }[]
 }
 
 /** All the numbers displayed on the dashboard, derived from the raw budget data. */
 export function computeSummary<TCategory extends CategoryLike>({
   incomes,
   categories,
-  expenses,
+  operations,
 }: SummaryInput<TCategory>) {
+  const expenses = operations.filter((o) => o.kind === 'expense')
   const income = sum(incomes.map((i) => i.amount))
   const fixed = sum(categories.filter((c) => c.kind === 'fixed').map((c) => c.monthlyAmount))
   const allocated = sum(categories.filter((c) => c.kind === 'flexible').map((c) => c.monthlyAmount))
   const spent = sum(expenses.map((e) => e.amount))
+  const extraIncome = sum(operations.filter((o) => o.kind === 'income').map((o) => o.amount))
 
   const spentByCategory = new Map<string | null, number>()
   for (const expense of expenses) {
@@ -44,13 +47,15 @@ export function computeSummary<TCategory extends CategoryLike>({
 
   return {
     income,
+    /** One-off money received this month (refund, bonus, gift...), on top of the recurring incomes. */
+    extraIncome,
     fixed,
     allocated,
     spent,
     /** What is left once rent, bills and other mandatory charges are paid. */
-    afterFixed: income - fixed,
+    afterFixed: income + extraIncome - fixed,
     /** What is left for the month once the expenses already added are also deducted. */
-    remaining: income - fixed - spent,
+    remaining: income + extraIncome - fixed - spent,
     /** Money that is neither a fixed charge nor assigned to an envelope. */
     unallocated: income - fixed - allocated,
     uncategorizedSpent: spentByCategory.get(null) ?? 0,

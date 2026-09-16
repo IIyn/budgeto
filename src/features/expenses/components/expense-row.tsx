@@ -1,6 +1,8 @@
+import { INCOME_ICON } from '@/features/budget/budget.constants'
 import type { Expense } from '@/features/budget/budget.queries'
 import { CategoryIcon } from '@/features/budget/components/category-icon'
 import { formatMoney } from '@/lib/money'
+import { cn } from '@/lib/utils'
 
 type ExpenseRowProps = {
   expense: Expense
@@ -8,19 +10,29 @@ type ExpenseRowProps = {
 }
 
 export function ExpenseRow({ expense, onSelect }: ExpenseRowProps) {
+  const isIncome = expense.kind === 'income'
   const content = (
     <>
-      <CategoryIcon
-        icon={expense.icon ?? expense.categoryIcon}
-        tone={expense.icon || expense.categoryId ? 'flexible' : 'neutral'}
-      />
+      {isIncome ? (
+        <CategoryIcon icon={expense.icon ?? INCOME_ICON} tone="income" />
+      ) : (
+        <CategoryIcon
+          icon={expense.icon ?? expense.categoryIcon}
+          tone={expense.icon || expense.categoryId ? 'flexible' : 'neutral'}
+        />
+      )}
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{expense.label}</span>
         <span className="text-muted-foreground block truncate text-xs">
-          {[expense.categoryName ?? 'Sans catégorie', expense.authorName].filter(Boolean).join(' · ')}
+          {[isIncome ? "Entrée d'argent" : (expense.categoryName ?? 'Sans catégorie'), expense.authorName]
+            .filter(Boolean)
+            .join(' · ')}
         </span>
       </span>
-      <span className="font-semibold tabular-nums">−{formatMoney(expense.amount)}</span>
+      <span className={cn('font-semibold tabular-nums', isIncome && 'text-success')}>
+        {isIncome ? '+' : '−'}
+        {formatMoney(expense.amount)}
+      </span>
     </>
   )
 
